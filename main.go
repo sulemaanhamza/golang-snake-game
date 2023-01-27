@@ -71,11 +71,11 @@ func InitScreen() {
 func InitGameState() {
 	snake = &Snake{
 		parts: []*Point{
-			{row: 5, col: 3},
-			{row: 6, col: 3},
-			{row: 7, col: 3},
-			{row: 8, col: 3},
 			{row: 9, col: 3},
+			{row: 8, col: 3},
+			{row: 7, col: 3},
+			{row: 6, col: 3},
+			{row: 5, col: 3},
 		},
 		velRow: -1,
 		velCol: 0,
@@ -118,6 +118,18 @@ func HandleUserInput(key string) {
 	if key == "Rune[q]" {
 		screen.Fini()
 		os.Exit(1)
+	} else if key == "Rune[w]" && snake.velRow != 1 {
+		snake.velRow = -1
+		snake.velCol = 0
+	} else if key == "Rune[a]" && snake.velCol != 1 {
+		snake.velRow = 0
+		snake.velCol = -1
+	} else if key == "Rune[s]" && snake.velRow != -1 {
+		snake.velRow = 1
+		snake.velCol = 0
+	} else if key == "Rune[d]" && snake.velCol != -1 {
+		snake.velRow = 0
+		snake.velCol = 1
 	}
 }
 
@@ -126,7 +138,13 @@ func UpdateState() {
 		return
 	}
 
-	// Update snake + apple
+	UpdateSnake()
+}
+
+func UpdateSnake() {
+	head := snake.parts[len(snake.parts)-1]
+	snake.parts = append(snake.parts, &Point{row: head.row + snake.velRow, col: head.col + snake.velCol})
+	snake.parts = snake.parts[1:]
 }
 
 func DrawState() {
