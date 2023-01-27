@@ -11,7 +11,7 @@ const SnakeSymbol = 0x2588
 const AppleSymbol = 0x25CF
 const GameFrameWidth = 30
 const GameFrameHeight = 15
-const GameFrameSymbol = "||"
+const GameFrameSymbol = '‖'
 
 type GameObject struct {
 	row, col, width, height int
@@ -116,12 +116,22 @@ func DrawState() {
 	screen.Clear()
 
 	PrintString(0, 0, debugLog)
-
+	PrintGameFrame()
 	for _, obj := range gameObjects {
 		PrintFilledRect(obj.row, obj.col, obj.width, obj.height, obj.symbol)
 	}
 
 	screen.Show()
+}
+
+func PrintGameFrame() {
+	// Get top-left of game-frame (row,col)
+
+	screenWidth, screenHeight := screen.Size()
+	row, col := screenHeight/2-GameFrameHeight/2-1, screenWidth/2-GameFrameWidth/2-1
+	width, height := GameFrameWidth+2, GameFrameHeight+2
+	// Print unfilled rectangle with the game-frame width/height
+	PrintUnFilledRect(row, col, width, height, GameFrameSymbol)
 }
 
 func PrintStringCentered(row, col int, str string) {
@@ -142,4 +152,21 @@ func PrintFilledRect(row, col, width, height int, ch rune) {
 			screen.SetContent(col+c, row+r, ch, nil, tcell.StyleDefault)
 		}
 	}
+}
+
+func PrintUnFilledRect(row, col, width, height int, ch rune) {
+
+	for c := 0; c < width; c++ {
+		screen.SetContent(col+c, row, ch, nil, tcell.StyleDefault)
+	}
+
+	for r := 1; r < height-1; r++ {
+		screen.SetContent(col, row+r, ch, nil, tcell.StyleDefault)
+		screen.SetContent(col+width-1, row+r, ch, nil, tcell.StyleDefault)
+	}
+
+	for c := 0; c < width; c++ {
+		screen.SetContent(col+c, row+height-1, ch, nil, tcell.StyleDefault)
+	}
+
 }
