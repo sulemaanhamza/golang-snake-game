@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gdamore/tcell"
+	"math/rand"
 	"os"
 	"time"
 )
@@ -35,6 +36,9 @@ var isGamePaused bool
 var debugLog string
 
 func main() {
+
+	rand.Seed(time.Now().UnixNano())
+
 	InitScreen()
 	InitGameState()
 	inputChan := InitUserInput()
@@ -139,12 +143,32 @@ func UpdateState() {
 	}
 
 	UpdateSnake()
+	UpdateApple()
 }
 
 func UpdateSnake() {
 	head := snake.parts[len(snake.parts)-1]
 	snake.parts = append(snake.parts, &Point{row: head.row + snake.velRow, col: head.col + snake.velCol})
-	snake.parts = snake.parts[1:]
+
+	if !AppleIsInsideSnake() {
+		snake.parts = snake.parts[1:]
+	}
+}
+
+func UpdateApple() {
+	for AppleIsInsideSnake() {
+		apple.point.row, apple.point.col = rand.Intn(GameFrameHeight), rand.Intn(GameFrameWidth)
+	}
+}
+
+func AppleIsInsideSnake() bool {
+	for _, p := range snake.parts {
+		if p.row == apple.point.row && p.col == apple.point.col {
+			return true
+		}
+	}
+
+	return false
 }
 
 func DrawState() {
