@@ -33,6 +33,8 @@ var screen tcell.Screen
 var snake *Snake
 var apple *Apple
 var isGamePaused bool
+var isGameOver bool
+var score int
 var debugLog string
 
 func main() {
@@ -43,7 +45,7 @@ func main() {
 	InitGameState()
 	inputChan := InitUserInput()
 
-	for {
+	for !isGameOver {
 		HandleUserInput(ReadInput(inputChan))
 		UpdateState()
 		DrawState()
@@ -51,6 +53,11 @@ func main() {
 		time.Sleep(75 * time.Millisecond)
 	}
 
+	screenWidth, screenHeight := screen.Size()
+	PrintStringCentered(screenHeight/2, screenWidth/2, "Game Over!")
+	PrintStringCentered(screenHeight/2+1, screenWidth/2, fmt.Sprintf("Your score is %d", score))
+	screen.Show()
+	time.Sleep(3 * time.Second)
 	screen.Fini()
 }
 
@@ -122,6 +129,8 @@ func HandleUserInput(key string) {
 	if key == "Rune[q]" {
 		screen.Fini()
 		os.Exit(1)
+	} else if key == "Rune[p]" {
+		isGamePaused = true
 	} else if key == "Rune[w]" && snake.velRow != 1 {
 		snake.velRow = -1
 		snake.velCol = 0
@@ -152,7 +161,19 @@ func UpdateSnake() {
 
 	if !AppleIsInsideSnake() {
 		snake.parts = snake.parts[1:]
+	} else {
+		score++
 	}
+
+	//
+	if IsSnakeHittingTheWall() {
+		isGameOver = true
+	}
+}
+
+func IsSnakeHittingTheWall() bool {
+	head := snake.parts[len(snake.parts)-1]
+	return head.row < 0 || head.row >= GameFrameHeight || head.col < 0 || head.col >= GameFrameWidth
 }
 
 func UpdateApple() {
