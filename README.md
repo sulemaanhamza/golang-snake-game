@@ -7,7 +7,7 @@ Snake game clone made with Golang using tcell terminal
 
 ## Key bindings
 
-Key bindings are 'w' and 's' for the left player and 'up arrow' and 'down arrow' for the right player.
+Key bindings are 'w' and 's' for the up & down and 'a' and 'd' for the left and right movement of the snake.
 
 
 ## License
